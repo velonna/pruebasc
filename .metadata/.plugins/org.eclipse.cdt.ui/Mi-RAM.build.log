@@ -1,0 +1,33 @@
+23:02:53 **** Incremental Build of configuration Default for project Mi-RAM ****
+make all 
+Building file: ../src/mi-ram.c
+Invoking: GCC C Compiler
+gcc -O2 -g -Wall -c -fmessage-length=0 -MMD -MP -MF"src/mi-ram.d" -MT"src/mi-ram.o" -o "src/mi-ram.o" "../src/mi-ram.c"
+Finished building: ../src/mi-ram.c
+ 
+Building file: ../src/utils.c
+Invoking: GCC C Compiler
+gcc -O2 -g -Wall -c -fmessage-length=0 -MMD -MP -MF"src/utils.d" -MT"src/utils.o" -o "src/utils.o" "../src/utils.c"
+../src/utils.c: In function ‘esperar_cliente’:
+../src/utils.c:49:69: warning: pointer targets in passing argument 3 of ‘accept’ differ in signedness [-Wpointer-sign]
+  int socket_cliente = accept(socket_servidor, (void*) &dir_cliente, &tam_direccion);
+                                                                     ^
+In file included from ../src/../include/utils.h:12:0,
+                 from ../src/utils.c:8:
+/usr/include/i386-linux-gnu/sys/socket.h:243:12: note: expected ‘socklen_t * restrict {aka unsigned int * restrict}’ but argument is of type ‘int *’
+ extern int accept (int __fd, __SOCKADDR_ARG __addr,
+            ^
+../src/utils.c: In function ‘iniciar_servidor’:
+../src/utils.c:41:12: warning: ‘socket_servidor’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+     return socket_servidor;
+            ^
+Finished building: ../src/utils.c
+ 
+Building target: Mi-RAM
+Invoking: GCC C Linker
+gcc  -o "Mi-RAM"  ./src/mi-ram.o ./src/utils.o   -lreadline -lcommons -lpthread
+Finished building target: Mi-RAM
+ 
+
+23:02:54 Build Finished (took 1s.16ms)
+

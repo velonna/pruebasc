@@ -1,0 +1,220 @@
+/*
+ * utils.c
+ *
+ *  Created on: 11 may. 2021
+ *      Author: utnso
+ */
+
+#include"../include/utils.h"
+
+
+void iniciar_servidor(char* puerto)
+{
+	int socket_servidor;
+	log_info(logger, "Servidor listo para recibir al cliente");
+    struct addrinfo hints, *servinfo, *p;
+
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_flags = AI_PASSIVE;
+
+    getaddrinfo(NULL, puerto, &hints, &servinfo);
+
+    for (p=servinfo; p != NULL; p = p->ai_next)
+    {
+        if ((socket_servidor = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1)
+            continue;
+
+        if (bind(socket_servidor, p->ai_addr, p->ai_addrlen) == -1) {
+            close(socket_servidor);
+            continue;
+        }
+        break;
+    }
+
+	listen(socket_servidor, SOMAXCONN);
+
+    freeaddrinfo(servinfo);
+
+    while(1)
+    	esperar_cliente(socket_servidor);
+}
+
+void esperar_cliente(int socket_servidor)
+{
+
+
+//	struct sockaddr_in dir_cliente;
+
+	//int tam_direccion = sizeof(struct sockaddr_in);
+
+	//int socket_cliente = accept(socket_servidor, (void*) &dir_cliente, &tam_direccion);
+	log_info(logger, "Servidor escuchando al cliente");
+	pthread_create(&thread,NULL,(void*)serve_client,&socket_servidor);
+	pthread_detach(thread);
+	log_info(logger, "Se creo un hilo para atender al cliente ");
+}
+
+void serve_client(int* socket)
+{
+	struct sockaddr_in addr;			// Esta estructura contendra los datos de la conexion del cliente. IP, puerto, etc.
+		socklen_t addrlen = sizeof(addr);
+
+		int socketCliente = accept(socket, (struct sockaddr *) &addr, &addrlen);
+
+
+			//process_request(cod_op, *socket);
+		t_Package package;
+		int status = 1;		// Estructura que manjea el status de los recieve.
+
+		printf("Cliente conectado. Esperando Envío de mensajes.\n");
+
+		while (status>0){
+
+			status = recieve_and_deserialize(&package, socketCliente);					// Ver el "Deserializando estructuras dinamicas" en el comentario de la funcion.
+			if (status) printf("%s says: %s", package.username, package.message);
+		}
+		printf("Cliente Desconectado.\n");
+	//}
+
+
+
+}
+int recieve_and_deserialize(t_Package *package, int socketCliente){
+
+	int status;
+	int buffer_size;
+	char *buffer = malloc(buffer_size = sizeof(uint32_t));
+
+	uint32_t username_long;
+	status = recv(socketCliente, buffer, sizeof(package->username_long), 0);
+	memcpy(&(username_long), buffer, buffer_size);
+	if (!status) return 0;
+
+	status = recv(socketCliente, package->username, username_long, 0);
+	if (!status) return 0;
+
+	uint32_t message_long;
+	status = recv(socketCliente, buffer, sizeof(package->message_long), 0);
+	memcpy(&(message_long), buffer, buffer_size);
+	if (!status) return 0;
+
+	status = recv(socketCliente, package->message, message_long, 0);
+	if (!status) return 0;
+
+
+	free(buffer);
+
+	return status;
+}
+void process_request(int cod_op, int cliente_fd) {
+	void iterator(char* value)
+		    	{
+		    		printf("%s\n", value);
+		    	}
+	int size;
+	t_list* lista;
+	void* msg;
+	log_info(logger, "proceso request"+cod_op);
+		switch (cod_op) {
+		case MENSAJE_I_MONGO:
+			//msg = recibir_mensaje(cliente_fd, &size);
+			//devolver_mensaje(msg, size, cliente_fd);
+			//free(msg);
+			break;
+		case PAQUETE_I_MONGO:
+			//lista = recibir_paquete(cliente_fd);
+			printf("Me llegaron los siguientes valores:\n");
+			//list_iterate(lista, (void*) iterator);
+			break;
+		case 2:
+			pthread_exit(NULL);
+			break;
+		case 3:
+			pthread_exit(NULL);
+			break;
+		default:
+			printf("no se encontro nada");
+		}
+}
+
+void* recibir_mensaje(int socket_cliente, int* size)
+{
+	void * buffer;
+
+	recv(socket_cliente, size, sizeof(int), MSG_WAITALL);
+	buffer = malloc(*size);
+	recv(socket_cliente, buffer, *size, MSG_WAITALL);
+
+	return buffer;
+}
+
+void* serializar_paquete(t_paquete* paquete, int bytes)
+{
+	void * magic = malloc(bytes);
+	int desplazamiento = 0;
+
+	memcpy(magic + desplazamiento, &(paquete->codigo_operacion), sizeof(int));
+	desplazamiento+= sizeof(int);
+	memcpy(magic + desplazamiento, &(paquete->buffer->size), sizeof(int));
+	desplazamiento+= sizeof(int);
+	memcpy(magic + desplazamiento, paquete->buffer->stream, paquete->buffer->size);
+	desplazamiento+= paquete->buffer->size;
+
+	return magic;
+}
+
+void devolver_mensaje(void* payload, int size, int socket_cliente)
+{
+	t_paquete* paquete = malloc(sizeof(t_paquete));
+
+	paquete->codigo_operacion = MENSAJE_I_MONGO;
+	paquete->buffer = malloc(sizeof(t_buffer));
+	paquete->buffer->size = size;
+	paquete->buffer->stream = malloc(paquete->buffer->size);
+	memcpy(paquete->buffer->stream, payload, paquete->buffer->size);
+
+	int bytes = paquete->buffer->size + 2*sizeof(int);
+
+	void* a_enviar = serializar_paquete(paquete, bytes);
+
+	send(socket_cliente, a_enviar, bytes, 0);
+
+	free(a_enviar);
+	free(paquete->buffer->stream);
+	free(paquete->buffer);
+	free(paquete);
+}
+t_list* recibir_paquete(int socket_cliente)
+{
+	int size=0;
+	int desplazamiento = 0;
+	void * buf;
+	t_list* valores = list_create();
+	int tamanio;
+	buf = recibir_buffer(&size, socket_cliente);
+	while(desplazamiento < size)
+	{
+		memcpy(&tamanio, buf + desplazamiento, sizeof(int));
+		desplazamiento+=sizeof(int);
+		char* valor = malloc(tamanio);
+		memcpy(valor, buf+desplazamiento, tamanio);
+		desplazamiento+=tamanio;
+		list_add(valores, valor);
+	}
+	free(buf);
+	return valores;
+	return NULL;
+}
+void* recibir_buffer(int* size, int socket_cliente)
+{
+	void * buffer;
+
+	recv(socket_cliente, size, sizeof(int), MSG_WAITALL);
+	buffer = malloc(*size);
+	recv(socket_cliente, buffer, *size, MSG_WAITALL);
+
+	return buffer;
+}
+

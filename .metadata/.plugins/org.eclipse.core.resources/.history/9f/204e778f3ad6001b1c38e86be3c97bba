@@ -1,0 +1,3 @@
+src/genericos.o: ../src/genericos.c ../src/../include/genericos.h
+
+../src/../include/genericos.h:

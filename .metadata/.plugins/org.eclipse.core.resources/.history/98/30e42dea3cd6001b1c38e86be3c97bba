@@ -1,0 +1,6 @@
+src/i-mongo-store.o: ../src/i-mongo-store.c \
+ ../src/../include/i-mongo-store.h ../src/../include/../include/utils.h
+
+../src/../include/i-mongo-store.h:
+
+../src/../include/../include/utils.h:

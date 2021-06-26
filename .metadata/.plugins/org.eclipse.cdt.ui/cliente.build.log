@@ -1,0 +1,29 @@
+15:01:19 **** Incremental Build of configuration Debug for project cliente ****
+make all 
+Building file: ../src/cliente.c
+Invoking: GCC C Compiler
+gcc -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"src/cliente.d" -MT"src/cliente.o" -o "src/cliente.o" "../src/cliente.c"
+../src/cliente.c: In function ‘main’:
+../src/cliente.c:28:28: warning: passing argument 3 of ‘pthread_create’ from incompatible pointer type [-Wincompatible-pointer-types]
+  pthread_create(&h1, NULL, iniciar_conexion, NULL);
+                            ^
+In file included from ../src/cliente.h:13:0,
+                 from ../src/cliente.c:8:
+/usr/include/pthread.h:233:12: note: expected ‘void * (*)(void *)’ but argument is of type ‘void (*)()’
+ extern int pthread_create (pthread_t *__restrict __newthread,
+            ^
+Finished building: ../src/cliente.c
+ 
+Building file: ../src/serializacion_cliente.c
+Invoking: GCC C Compiler
+gcc -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"src/serializacion_cliente.d" -MT"src/serializacion_cliente.o" -o "src/serializacion_cliente.o" "../src/serializacion_cliente.c"
+Finished building: ../src/serializacion_cliente.c
+ 
+Building target: cliente
+Invoking: GCC C Linker
+gcc  -o "cliente"  ./src/cliente.o ./src/serializacion_cliente.o   -lcommons -lpthread -lreadline
+Finished building target: cliente
+ 
+
+15:01:20 Build Finished (took 643ms)
+

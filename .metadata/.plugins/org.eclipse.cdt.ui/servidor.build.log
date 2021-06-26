@@ -1,0 +1,34 @@
+14:34:30 **** Incremental Build of configuration Debug for project servidor ****
+make all 
+Building file: ../src/serializacion.c
+Invoking: GCC C Compiler
+gcc -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"src/serializacion.d" -MT"src/serializacion.o" -o "src/serializacion.o" "../src/serializacion.c"
+Finished building: ../src/serializacion.c
+ 
+Building file: ../src/servidor.c
+Invoking: GCC C Compiler
+gcc -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"src/servidor.d" -MT"src/servidor.o" -o "src/servidor.o" "../src/servidor.c"
+Finished building: ../src/servidor.c
+ 
+Building file: ../src/utils.c
+Invoking: GCC C Compiler
+gcc -O0 -g3 -Wall -c -fmessage-length=0 -MMD -MP -MF"src/utils.d" -MT"src/utils.o" -o "src/utils.o" "../src/utils.c"
+../src/utils.c: In function ‘esperar_cliente’:
+../src/utils.c:50:69: warning: pointer targets in passing argument 3 of ‘accept’ differ in signedness [-Wpointer-sign]
+  int socket_cliente = accept(socket_servidor, (void*) &dir_cliente, &tam_direccion);
+                                                                     ^
+In file included from ../src/utils.h:14:0,
+                 from ../src/utils.c:9:
+/usr/include/i386-linux-gnu/sys/socket.h:243:12: note: expected ‘socklen_t * restrict {aka unsigned int * restrict}’ but argument is of type ‘int *’
+ extern int accept (int __fd, __SOCKADDR_ARG __addr,
+            ^
+Finished building: ../src/utils.c
+ 
+Building target: servidor
+Invoking: GCC C Linker
+gcc  -o "servidor"  ./src/serializacion.o ./src/servidor.o ./src/utils.o   -lpthread
+Finished building target: servidor
+ 
+
+14:34:31 Build Finished (took 696ms)
+

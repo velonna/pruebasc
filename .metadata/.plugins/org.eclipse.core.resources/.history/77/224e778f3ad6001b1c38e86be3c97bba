@@ -1,0 +1,6 @@
+src/i-mong-fs.o: ../src/i-mong-fs.c ../src/../include/i-mongo-fs.h \
+ ../src/../include/genericos.h
+
+../src/../include/i-mongo-fs.h:
+
+../src/../include/genericos.h:

@@ -1,0 +1,38 @@
+03:59:49 **** Incremental Build of configuration Debug for project i-mongo ****
+make all 
+Building file: ../src/utils.c
+Invoking: GCC C Compiler
+gcc -O2 -g -Wall -c -fmessage-length=0 -MMD -MP -MF"src/utils.d" -MT"src/utils.o" -o "src/utils.o" "../src/utils.c"
+../src/utils.c: In function ‘serve_client’:
+../src/utils.c:64:30: warning: passing argument 1 of ‘accept’ makes integer from pointer without a cast [-Wint-conversion]
+   int socketCliente = accept(socket, (struct sockaddr *) &addr, &addrlen);
+                              ^
+In file included from ../src/../include/utils.h:13:0,
+                 from ../src/utils.c:8:
+/usr/include/i386-linux-gnu/sys/socket.h:243:12: note: expected ‘int’ but argument is of type ‘int *’
+ extern int accept (int __fd, __SOCKADDR_ARG __addr,
+            ^
+../src/utils.c: In function ‘process_request’:
+../src/utils.c:118:8: warning: unused variable ‘msg’ [-Wunused-variable]
+  void* msg;
+        ^
+../src/utils.c:117:10: warning: unused variable ‘lista’ [-Wunused-variable]
+  t_list* lista;
+          ^
+../src/utils.c:116:6: warning: unused variable ‘size’ [-Wunused-variable]
+  int size;
+      ^
+../src/utils.c: In function ‘iniciar_servidor’:
+../src/utils.c:41:6: warning: ‘socket_servidor’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+      esperar_cliente(socket_servidor);
+      ^
+Finished building: ../src/utils.c
+ 
+Building target: i-mongo
+Invoking: GCC C Linker
+gcc  -o "i-mongo"  ./src/genericos.o ./src/i-mong-fs.o ./src/i-mongo-store.o ./src/utils.o   -lcommons -lpthread -lreadline
+Finished building target: i-mongo
+ 
+
+03:59:49 Build Finished (took 666ms)
+
